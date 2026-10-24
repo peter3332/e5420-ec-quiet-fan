@@ -194,6 +194,7 @@ The most useful next steps are **offline**: fully trace the candidate validator,
 
 ### Related records
 
+- [Fan Minimum Drive, all three temperature–RPM profiles, and the inferred hysteresis model](THERMAL_PROFILE_MAP.md).
 - [ARC600 side findings in English](EC_ARC600_SIDE_FINDINGS.md): boot/runtime, timer IRQ, TACH diagnostics, flash-record writer, PS/2 keyboard handling.
 - Detailed three-region checksum investigation, original Polish.
 - Original AC/S5 postmortem, Polish.
