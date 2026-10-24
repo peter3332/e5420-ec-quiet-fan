@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 peter3332
 """Read-only, reproducible EC additive checksum audit for Dell Latitude E5420 A14.
 
 Never writes firmware, USB, EC registers or any binary file. The variants are
