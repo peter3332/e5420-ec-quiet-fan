@@ -1,5 +1,7 @@
 # Dell Latitude E5420 A14 — Quiet Fan Modification & ARC600 EC Reverse Engineering
 
+> 🇵🇱 **MADE IN POLAND** — Independent engineering, research and reverse engineering.
+
 **A noisy 3,300 RPM fan led us into the Dell Embedded Controller's ARM-independent ARC600 firmware. We mapped its fan-drive initialization, discovered three temperature–RPM profiles, measured how the automatic fan curve behaves, and uncovered internal firmware checksums that proved essential to our experimental repair.**
 
 **This repository is about making an E5420 quieter while understanding exactly what we changed — not merely about checksums.**
