@@ -28,6 +28,7 @@ This is a meaningful experimental result, **not a verified long-term or cross-de
 - [Three additive EC checksum regions](docs/EC_ADDITIVE_CHECKSUM.md) — how the format was discovered and why the first whole-image sum hypothesis required correction.
 - [The original AC/S5 incident](docs/AC_S5_POSTMORTEM.md) — October 19 observations and the subsequent explanation.
 - [ARC600 side findings and dead ends](docs/EC_ARC600_SIDE_FINDINGS.md) — boot code, timers, interrupts, indexed fan MMIO, TACH, flash records, service commands and keyboard decoding.
+- [**Minimum Drive, thermal profiles A/B/C and hysteresis**](docs/THERMAL_PROFILE_MAP.md) — documented offsets, temperature pairs, RPM setpoints and confidence levels.
 - [Historical thermal test results](docs/HISTORICAL_THERMAL_RESULTS.md) — 2,500 / 3,300 / 4,300 RPM curve and nine-minute tests on the uncorrected image.
 - [Read-only UEFI/PE static reproduction](docs/REPRODUCE.md).
 - [Offline checksum auditor and historical builder](docs/TOOLS.md).
