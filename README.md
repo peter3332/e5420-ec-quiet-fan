@@ -43,6 +43,15 @@ M54FIX EC        90648894233eca7b25ee2fc53922254988c7a764e7f582c429ee34f175e59fb
 M54FIX EXE       45a735456487f09f94043c2405ef4df9bc4a84db4e8e5a05bd814572e5fa9f40
 ```
 
+## Open licenses — free to reuse
+
+**Please use, improve, translate and share this work. Commercial use is allowed.**
+
+- **Python source code in `tools/`: [MIT License](LICENSE)** ([SPDX: MIT](https://spdx.org/licenses/MIT)). Copy, modify, redistribute, sublicense, or use the tools commercially, retaining the copyright and license notice.
+- **Original research documentation: [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE-DOCS.md)** ([license overview](https://creativecommons.org/licenses/by/4.0/)). Copy, redistribute, translate, adapt, or use the writing commercially, crediting **peter3332**, linking to the license, and indicating any changes.
+
+The grants cover material we are entitled to license; **third-party content and Dell firmware are not relicensed**. See [documentation-license details](LICENSE-DOCS.md).
+
 ## Reproduction and safety
 
 The `tools/` directory contains only **Python source**, with no Dell-owned binary files. `audit_ec_additive_checksum.py` is read-only. `build_min54quiet_from_available.py` can reconstruct an **unsigned, modified updater file on disk** from verified inputs supplied separately by a researcher; **it does not flash** the laptop.
@@ -55,4 +64,4 @@ A rebuilt EXE **does not possess a valid Dell Authenticode signature**. Flashing
 
 This public-edition source tree is designed to be committed to a **new, clean Git repository**. It intentionally excludes raw terminal logs, local user/hostname strings, personal correspondence, prepublication commit history, proprietary firmware and generated updater executables. The full original research archive remains separate and private.
 
-For reuse/copyright questions, see [PUBLICATION.md](PUBLICATION.md). The specific borrowed code credits described in the original private research are not incorporated into this source-only release.
+For background, safety, and public-release provenance, see [PUBLICATION.md](PUBLICATION.md). The specific borrowed code credits described in the original private research are not incorporated into this source-only release.
