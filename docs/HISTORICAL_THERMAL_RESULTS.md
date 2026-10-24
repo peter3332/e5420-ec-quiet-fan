@@ -4,6 +4,8 @@
 
 > **Retrospective safety context.** This translates the substance of the original October 13 results, which were subsequently **withdrawn as a final firmware-safety judgment on October 19** following the AC/S5 EC freeze. On October 24 the missing internal additive EC checksums were identified, and a checksum-corrected M54FIX image subsequently had one user-reported successful AC/S5 test. Do not interpret these historical thermal observations as proof that the original uncorrected MIN54-QUIET is safe. See the [English postmortem](AC_S5_POSTMORTEM.md) and [M54FIX report](M54FIX_AC_S5_CASE_STUDY.md).
 
+> See the [complete thermal profile map](THERMAL_PROFILE_MAP.md) for all three A/B/C temperature–RPM tables, Minimum Drive offsets, and the limits of the hysteresis interpretation.
+
 ## 1. What the experimenter originally wanted
 
 The goal was a quieter, automatically regulated Dell E5420: reduce the first BIOS-controlled fan stage from about **3,300 RPM** to **2,500 RPM**, while retaining higher stages and thermally protective behavior. The experimenter considered ~2,500 RPM **virtually inaudible**, and did not mind the brief startup boost.
