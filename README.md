@@ -22,68 +22,68 @@ We also tested a more aggressive ~2,260 RPM first stage (MIN54-AUTO). It was qui
 
 ## 2. Finding the fan's *Minimum Drive* setting in ARC600
 
-Disassembly of the extracted **229,376-byte (\`0x38000\`) stock EC image** revealed **two** initialization paths with a matching indexed register write:
+Disassembly of the extracted **229,376-byte (`0x38000`) stock EC image** revealed **two** initialization paths with a matching indexed register write:
 
 | Stock EC location | Code sequence (simplified) | Changed operand | Stock → quiet value |
 |---|---|---|---|
-| Around \`0x2748\` | \`r0=0xF01480, r1=0x87, r2=0x66\` → wrapper \`0x1474\` | **\`0x02750\`** | **\`0x66 → 0x54\`** |
-| Around \`0x164CE\` | \`r0=0xF01480, r1=0x87, r2=0x66\` → wrapper \`0x5784\` | **\`0x164D6\`** | **\`0x66 → 0x54\`** |
+| Around `0x2748` | `r0=0xF01480, r1=0x87, r2=0x66` → wrapper `0x1474` | **`0x02750`** | **`0x66 → 0x54`** |
+| Around `0x164CE` | `r0=0xF01480, r1=0x87, r2=0x66` → wrapper `0x5784` | **`0x164D6`** | **`0x66 → 0x54`** |
 
-The underlying routines write the **index** to \`[0xF01480+4] = 0xF01484\` and the **value** to \`[0xF01480+8] = 0xF01488\`. Adjacent settings form the pattern \`0x85=0x19\`, \`0x86=0x10\`, \`0x87=0x66\`, \`0x88=0xF5\`. Those values resemble *Spin Up / Max Step / Minimum Drive / Valid TACH* controls in other SMSC/Microchip fan-controller implementations.
+The underlying routines write the **index** to `[0xF01480+4] = 0xF01484` and the **value** to `[0xF01480+8] = 0xF01488`. Adjacent settings form the pattern `0x85=0x19`, `0x86=0x10`, `0x87=0x66`, `0x88=0xF5`. Those values resemble *Spin Up / Max Step / Minimum Drive / Valid TACH* controls in other SMSC/Microchip fan-controller implementations.
 
-**What is proven:** the actual two instruction operands, indexed hardware writes, and measured speed effects. **What is inferred:** that index \`0x87\` is formally named *Minimum Drive* for this exact EC; we do **not** have a matching vendor register map or electrical PWM measurements.
+**What is proven:** the actual two instruction operands, indexed hardware writes, and measured speed effects. **What is inferred:** that index `0x87` is formally named *Minimum Drive* for this exact EC; we do **not** have a matching vendor register map or electrical PWM measurements.
 
 The experimental manual Dell SMM requests exposed a lower RPM floor as this value was decreased:
 
 | Both initialization values | Historical variant | Manual request | Actual settled speed |
 |---|---|---|---|
-| \`0x66\` | Stock A14 | 2,000 RPM | ~2,725 RPM |
-| \`0x60\` | MIN60 | 2,000 RPM | ~2,575–2,581 RPM |
-| \`0x58\` | MIN58 | 1,500 RPM | ~2,368–2,377 RPM |
-| **\`0x54\`** | **MIN54** | 1,500 RPM | **~2,263–2,270 RPM** |
-| \`0x50\` | MIN50 | 1,500–2,000 RPM | **Unstable oscillation** |
+| `0x66` | Stock A14 | 2,000 RPM | ~2,725 RPM |
+| `0x60` | MIN60 | 2,000 RPM | ~2,575–2,581 RPM |
+| `0x58` | MIN58 | 1,500 RPM | ~2,368–2,377 RPM |
+| **`0x54`** | **MIN54** | 1,500 RPM | **~2,263–2,270 RPM** |
+| `0x50` | MIN50 | 1,500–2,000 RPM | **Unstable oscillation** |
 
 These were **manual SMM speed-request tests**, not the BIOS AUTO table values. Changing *Minimum Drive* alone did **not** change the factory ~3,300 RPM automatic first-stage target. That required finding a different firmware structure.
 
 ## 3. Discovery of three temperature–RPM profile tables
 
-A pointer table in the EC image led to **three 36-byte (\`0x24\`) records**:
+A pointer table in the EC image led to **three 36-byte (`0x24`) records**:
 
 | Pointer stored at | Record header | First normal 4-byte stage | Working interpretation |
 |---|---|---|---|
-| **\`0x216B8\`** | \`0x216C8\` | **\`0x216D0\`** | **Profile A — very likely CPU** |
-| **\`0x216BC\`** | \`0x216EC\` | **\`0x216F4\`** | **Profile B — sensor unknown** |
-| **\`0x216C0\`** | \`0x21710\` | **\`0x21718\`** | **Profile C — sensor unknown** |
+| **`0x216B8`** | `0x216C8` | **`0x216D0`** | **Profile A — very likely CPU** |
+| **`0x216BC`** | `0x216EC` | **`0x216F4`** | **Profile B — sensor unknown** |
+| **`0x216C0`** | `0x21710` | **`0x21718`** | **Profile C — sensor unknown** |
 
 Each normal stage we identified consists of two single-byte temperatures followed by a **16-bit little-endian RPM setpoint**. The first three normal stages in each profile are:
 
 | Profile | Raw EC stage offset | Temperature pair (°C) | Target RPM |
 |---|---|---|---:|
-| **A** | \`0x216D0\` | **50 / 72** | **2,500** in M54FIX; 3,300 stock |
-| **A** | \`0x216D4\` | **65 / 80** | **3,300** in M54FIX; stock 65 / 78 and 3,800 |
-| **A** | \`0x216D8\` | **74 / 85** | **4,300**, unchanged |
-| **B** | \`0x216F4\` | 43 / 50 | 3,300 |
-| **B** | \`0x216F8\` | 47 / 54 | 3,800 |
-| **B** | \`0x216FC\` | 51 / 58 | 4,300 |
-| **C** | \`0x21718\` | 48 / 53 | 3,300 |
-| **C** | \`0x2171C\` | 51 / 56 | 3,800 |
-| **C** | \`0x21720\` | 54 / 59 | 4,300 |
+| **A** | `0x216D0` | **50 / 72** | **2,500** in M54FIX; 3,300 stock |
+| **A** | `0x216D4` | **65 / 80** | **3,300** in M54FIX; stock 65 / 78 and 3,800 |
+| **A** | `0x216D8` | **74 / 85** | **4,300**, unchanged |
+| **B** | `0x216F4` | 43 / 50 | 3,300 |
+| **B** | `0x216F8` | 47 / 54 | 3,800 |
+| **B** | `0x216FC` | 51 / 58 | 4,300 |
+| **C** | `0x21718` | 48 / 53 | 3,300 |
+| **C** | `0x2171C` | 51 / 56 | 3,800 |
+| **C** | `0x21720` | 54 / 59 | 4,300 |
 
-**Actual edited bytes at profile A offset \`0x216D0\` in MIN54-QUIET / M54FIX:**
+**Actual edited bytes at profile A offset `0x216D0` in MIN54-QUIET / M54FIX:**
 
-\`\`\`text
+```text
 32 48 C4 09 | 41 50 E4 0C | 4A 55 CC 10
 50 72 2500  | 65 80 3300  | 74 85 4300
-\`\`\`
+```
 
 The stock first three profile A entries were:
 
-\`\`\`text
+```text
 32 48 E4 0C | 41 4E D8 0E | 4A 55 CC 10
 50 72 3300  | 65 78 3800  | 74 85 4300
-\`\`\`
+```
 
-The header at \`0x216CC\` includes \`81 43 00 00\`; \`0x43 = 67\` agrees with an approximately **67°C observed fan-start condition** on the Dell-reported CPU sensor. The entire 36-byte structure has **not** been decoded; special values including \`0x5356\` must **not** be mistaken for ordinary fan RPM setpoints. Only profile A has been linked convincingly to CPU behavior; assigning profiles B and C to specific sensors would be speculation.
+The header at `0x216CC` includes `81 43 00 00`; `0x43 = 67` agrees with an approximately **67°C observed fan-start condition** on the Dell-reported CPU sensor. The entire 36-byte structure has **not** been decoded; special values including `0x5356` must **not** be mistaken for ordinary fan RPM setpoints. Only profile A has been linked convincingly to CPU behavior; assigning profiles B and C to specific sensors would be speculation.
 
 ## 4. Hysteresis: an evidence-based model, not yet a disassembled algorithm
 
@@ -95,7 +95,7 @@ A natural interpretation of each temperature pair is a **lower threshold for ret
 | First ↔ second stage | **~72°C**, observed on quiet-profile tests | **~65°C**, inferred from next row |
 | Second ↔ third stage | **~80°C**, behaviorally supported near 80–81°C | **~74°C**, inferred from next row |
 
-This is **not a confirmed EC hysteresis implementation**. In particular, our historical QUIET→QUIET2 edit **\`0x216D1: 0x48→0x4A\` (72→74°C)** shifted the observed first-to-second transition accordingly, but the proposed **65°C and 74°C downward thresholds** were **not independently measured**. Delays, filtered temperatures, startup logic and arbitration between profiles may also influence the actual fan stage.
+This is **not a confirmed EC hysteresis implementation**. In particular, our historical QUIET→QUIET2 edit **`0x216D1: 0x48→0x4A` (72→74°C)** shifted the observed first-to-second transition accordingly, but the proposed **65°C and 74°C downward thresholds** were **not independently measured**. Delays, filtered temperatures, startup logic and arbitration between profiles may also influence the actual fan stage.
 
 The [full thermal-profile map](docs/THERMAL_PROFILE_MAP.md) separates actual byte evidence and RPM measurements from these state-machine hypotheses, and lists unresolved code paths.
 
@@ -107,17 +107,17 @@ We discovered that stock A14 has three separately zero-balanced regions of 32-bi
 
 | Working region name | EC half-open byte interval | Compensation word |
 |---|---|---|
-| BOOT-1 | \`[0x1000,0x4400)\` | **\`0x43FC\`** |
-| BRIDGE | \`[0x4400,0x5000)\` | \`0x4FFC\` |
-| BOOT-2 | \`[0x5000,0x38000)\` | **\`0x37FFC\`** |
+| BOOT-1 | `[0x1000,0x4400)` | **`0x43FC`** |
+| BRIDGE | `[0x4400,0x5000)` | `0x4FFC` |
+| BOOT-2 | `[0x5000,0x38000)` | **`0x37FFC`** |
 
 The historical MIN54-QUIET violated BOOT-1 and BOOT-2 checksums. The **M54FIX** update preserved exactly the seven functional fan-control edits while restoring all three regions to a zero sum by changing **four checksum-compensation bytes**:
 
-\`\`\`text
+```text
 BOOT-1 @ 0x43FC: 0x2704FF56 → 0x2704FF68
 BOOT-2 @ 0x37FFC: 0xC86347B3 → 0xCD8945B3
 BRIDGE: unchanged
-\`\`\`
+```
 
 The corrected updater passed two offline validation rounds, successfully booted the test laptop after FreeDOS flashing, and was followed by **one user-reported successful AC insertion in S5**. This strongly supports missing internal checksum compensation as the earlier defect, **but does not prove the exact ARC600 fallback path or long-term safety**. No independent physical EC-flash readback or verified recovery method is available.
 
