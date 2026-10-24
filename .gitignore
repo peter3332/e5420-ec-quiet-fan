@@ -1,0 +1,27 @@
+# Vendor firmware, updater binaries, extraction work products
+firmware/
+work/
+*.exe
+*.bin
+*.rom
+*.fd
+*.cap
+*.sig
+*.pfs
+*.efi
+*.dump/
+*.report.txt
+# Credentials, local environments and logs
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+__pycache__/
+*.pyc
+.venv/
+venv/
+logs/
+*.csv
+.DS_Store
