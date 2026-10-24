@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 peter3332
 """Offline reconstruction of the *historically tested* MIN54-QUIET + EC additive checksums.
 
 Dell E5420 A14. Pure Python 3 standard library. Nothing is flashed or sent to EC.
